@@ -11,13 +11,19 @@ void print_back(const vector<T> &veint);
 
 void fillVector(vector<int>& vi, size_t size);
 
-bool comparison(int extremum, int i);
+bool comparison(int extremum, int i, double part);
 
 void discover(vector<int>& vi);
 
+bool const MINIMUM = false;
+bool const MAXIMUM = true;
+
+
+void addExtremum(vector<pair<int, bool>> &vec, pair<int, bool> const& elem);
 
 int main() {
     srand(time(0));
+    //vector<int> vi {100, 151, 150, 250, 249, 400, 395, 397, 200, 205, 107, 120};
     vector<int> vi;
     fillVector(vi, 10);
     print_streight(vi);
@@ -76,24 +82,58 @@ void discover(vector<int>& vi) {
     cout << "=================================================" << endl;
     print_streight(minMax);
 
-    if (minMax[0] < minMax[1]) {
+
+    vector<std::pair<int, bool>> smartVector;
+    pair<int, bool > elem(100, false);
+    double part = 1.5;
+    if (minMax[0] < minMax[1] && comparison(minMax[0], minMax[1], part)) {
         cout << "min " << minMax[0] << endl;
-    } else if (minMax[0] > minMax[1]) {
+
+        elem.first = minMax[0];
+        elem.second = false;
+        addExtremum(smartVector, elem);
+    } else if (minMax[0] > minMax[1] && comparison(minMax[0], minMax[1], part)) {
         cout << "max " << minMax[0] << endl;
+
+        elem.first = minMax[0];
+        elem.second = true;
+        addExtremum(smartVector, elem);
     }
     int extremum = minMax[0];
     for (int j = 1; j < minMax.size(); ++j) {
-        if (extremum > minMax[j] && comparison(extremum, minMax[j])) {
+        if (extremum > minMax[j] && comparison(extremum, minMax[j], part)) {
             extremum = minMax[j];
             cout << "min " << extremum << endl;
-        } else if (extremum < minMax[j] && comparison(extremum, minMax[j])) {
+
+            elem.first = minMax[j];
+            elem.second = false;
+            addExtremum(smartVector, elem);
+        } else if (extremum < minMax[j] && comparison(extremum, minMax[j], part)) {
             extremum = minMax[j];
             cout << "max " << extremum << endl;
+
+            elem.first = minMax[j];
+            elem.second = true;
+            addExtremum(smartVector, elem);
         }
+    }
+
+    cout << "=================================================" << endl;
+
+    for (auto elem : smartVector) {
+        cout << elem.first << " -> " << ( (elem.second)  ? "maxim" : "minim" ) << endl;
     }
 }
 
-bool comparison(int p1, int p2) {
+void addExtremum(vector<std::pair<int, bool>> &vec, pair<int, bool> const& elem) {
+    size_t size = vec.size();
+    if (size == 0) { vec.push_back(elem); }
+    else if (vec[size - 1].second == elem.second) { vec[size - 1] = elem; }
+    else { vec.push_back(elem); }
+    //cout << elem.first << " -> " << elem.second << endl;
+}
+
+bool comparison(int p1, int p2, double part) {
     double maxim, minim;
     if (p1 > p2) {
         maxim = p1;
@@ -102,5 +142,6 @@ bool comparison(int p1, int p2) {
         maxim = p2;
         minim = p1;
     }
-    return maxim / minim > 1.5;
+    return maxim / minim > part;
 }
+
